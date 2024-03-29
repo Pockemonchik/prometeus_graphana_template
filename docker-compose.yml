@@ -68,7 +68,7 @@ services:
     image: metalmatze/alertmanager-bot:0.4.3
     user: root
     ports:
-      - 8080:8080
+      - 8090:8090
     container_name: alertmanager-bot
     hostname: alertmanager-bot
     environment:
@@ -111,6 +111,28 @@ services:
       - ./blackbox:/etc/blackbox
     environment:
       TZ: "Europe/Moscow"
+    networks:
+      - default
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    privileged: true
+    ports:
+      - '8080:8080'
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - /:/rootfs:ro
+      - /dev/disk/:/dev/disk:ro
+      - /sys:/sys:ro
+      - /var/run:/var/run:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    deploy:
+      mode: global
+    command:
+      - "--housekeeping_interval=30s"
+      - "--docker_only=true"
+      - "--disable_metrics=percpu,sched,tcp,udp,disk,diskIO,hugetlb,referenced_memory,cpu_topology,resctrl"
     networks:
       - default
 
